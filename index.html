@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>PUB</title>
+</head>
+<body>
+  <a id="video-banner-link" target="_blank">
+    <video id="video-banner" autoplay nocontrol muted>
+      <source id="video-banner-source" />
+      Vídeo não suportado.
+    </video>
+  </a>
+
+  <script>
+    function getQueryParams(qs) {
+      qs = qs.split('+').join(' ');
+
+      const params = {};
+      const regex = /[?&]?([^=]+)=([^&]*)/g;
+      let tokens;
+
+      while (tokens = regex.exec(qs)) {
+          params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+      }
+
+      return params;
+    }
+
+    const video = document.getElementById("video-banner");
+    const source = document.getElementById("video-banner-source");
+    const link = document.getElementById("video-banner-link");
+    const qs = getQueryParams(document.location.search);
+
+    if (qs.src) {
+      source.src = qs.src;
+    }
+
+    if (qs.href) {
+      link.href = qs.href;
+    }
+
+    if (qs.loop) {
+      video.loop = true;
+    }
+
+    if (qs.sound) {
+      video.onloadstart = function() {
+        video.addEventListener('mouseover', function(){
+          video.muted = false;
+        });
+
+        video.addEventListener('mouseout', function(){
+          video.muted = true;
+        });
+      };
+    }
+  </script>
+</body>
+</html>
