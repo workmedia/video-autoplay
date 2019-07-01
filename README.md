@@ -17,3 +17,4 @@ For example, if this project is running at `localhost:3000` and the server is al
   - `&loop=1`: Defines if the video will loop
   - `&href=http://example.pt`: A link that will open in a new tab if the user click on the banner.
   - `&sound=1`: DEfines if the sound will be unmuted when the user tap (mobile) or mouse over (desktop) it.
+  - `&poster=image.png`: An image that will appear while the video is loading.
