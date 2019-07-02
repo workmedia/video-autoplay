@@ -40,34 +40,34 @@
 
     const onVisibilityChange = (els) => () => els.forEach(el =>  el.onVisibilityChange());
 
-    const iframes = [...document.getElementsByTagName('iframe')];
-    
     const handleVisibilityChange = (el, isVisible) => {
       console.log('message posted:', { el, isVisible });
       el.contentWindow.postMessage({ isVisible }, '*');
     };
-    
-    const handler = debounce(
-      onVisibilityChange(
-        addVisibilityAndHandlerToEachElement(iframes, handleVisibilityChange)
-      ),
-      500
-    );
-
-    if (window.addEventListener) {
-      window.addEventListener('DOMContentLoaded', handler, false); 
-      window.addEventListener('load', handler, false); 
-      window.addEventListener('scroll', handler, false); 
-      window.addEventListener('resize', handler, false); 
-      window.addEventListener('visibilitychange', handler, false); 
-    } else if (window.attachEvent)  {
-      window.attachEvent('onDOMContentLoaded', handler); // IE9+ :(
-      window.attachEvent('onload', handler);
-      window.attachEvent('onscroll', handler);
-      window.attachEvent('onresize', handler);
-    }
 
     setTimeout(() => {
+      const iframes = [...document.getElementsByTagName('iframe')];
+      
+      const handler = debounce(
+        onVisibilityChange(
+          addVisibilityAndHandlerToEachElement(iframes, handleVisibilityChange)
+        ),
+        500
+      );
+  
+      if (window.addEventListener) {
+        window.addEventListener('DOMContentLoaded', handler, false); 
+        window.addEventListener('load', handler, false); 
+        window.addEventListener('scroll', handler, false); 
+        window.addEventListener('resize', handler, false); 
+        window.addEventListener('visibilitychange', handler, false); 
+      } else if (window.attachEvent)  {
+        window.attachEvent('onDOMContentLoaded', handler); // IE9+ :(
+        window.attachEvent('onload', handler);
+        window.attachEvent('onscroll', handler);
+        window.attachEvent('onresize', handler);
+      }
+
       handler();
-    }, 5000);
+    }, 1000);
 })()
