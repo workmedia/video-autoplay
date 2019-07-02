@@ -43,7 +43,7 @@
     const iframes = [...document.getElementsByTagName('iframe')];
     
     const handleVisibilityChange = (el, isVisible) => {
-      console.log('message posted:', { isVisible });
+      console.log('message posted:', { el, isVisible });
       el.contentWindow.postMessage({ isVisible }, '*');
     };
     
