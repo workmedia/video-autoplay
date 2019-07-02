@@ -41,7 +41,6 @@
     const onVisibilityChange = (els) => () => els.forEach(el =>  el.onVisibilityChange());
 
     const handleVisibilityChange = (el, isVisible) => {
-      console.log('message posted:', { el, isVisible });
       el.contentWindow.postMessage({ isVisible }, '*');
     };
 
