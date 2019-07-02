@@ -26,170 +26,63 @@
       Vídeo não suportado.
     </video>
   </a>
-
   <script>
-    function debounce(func) {
-      var wait = arguments.length <= 1 || arguments[1] === undefined ? 100 : arguments[1];
-
-      var timeout = void 0;
-      return function () {
-        var _this = this;
-
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
-
-        clearTimeout(timeout);
-        timeout = setTimeout(function () {
-          func.apply(_this, args);
-        }, wait);
-      };
+  function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+  
+    const params = {};
+    const regex = /[?&]?([^=]+)=([^&]*)/g;
+    let tokens;
+  
+    while ((tokens = regex.exec(qs))) {
+      params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
     }
-    
-    function getQueryParams(qs) {
-      qs = qs.split('+').join(' ');
+  
+    return params;
+  }
+  
+  const video = document.getElementById("video-banner");
+  const source = document.getElementById("video-banner-source");
+  const link = document.getElementById("video-banner-link");
+  const qs = getQueryParams(document.location.search);
+  
+  if (qs.src) {
+    source.src = qs.src;
+  }
+  
+  if (qs.href) {
+    link.href = qs.href;
+  }
+  
+  if (qs.loop) {
+    video.loop = true;
+  }
+  
+  if (qs.poster) {
+    video.poster = qs.poster;
+  }
 
-      const params = {};
-      const regex = /[?&]?([^=]+)=([^&]*)/g;
-      let tokens;
+  if (qs.sound) {
+    video.addEventListener("mouseover", function() {
+      video.muted = false;
+    });
 
-      while (tokens = regex.exec(qs)) {
-          params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+    video.addEventListener("mouseout", function() {
+      video.muted = true;
+    });
+  }
+
+  window.addEventListener(
+    "message",
+    event => {
+      if (!event.data) {
+        return;
       }
 
-      return params;
-    }
-
-    function getActualWindow(w) {
-      if (w.parent === w) {
-        return w;
-      }
-
-      return getActualWindow(w.parent);
-    }
-
-    const actualWindow = getActualWindow(window);
-
-    function getCurrentFrameAbsolutePosition() {
-      let currentWindow = window;
-      let currentParentWindow;
-      let positions = [];
-      let rect;
-
-      while (currentWindow !== window.top) {
-        currentParentWindow = currentWindow.parent;
-        for (let idx = 0; idx < currentParentWindow.frames.length; idx++)
-          if (currentParentWindow.frames[idx] === currentWindow) {
-            for (let frameElement of currentParentWindow.document.getElementsByTagName('iframe')) {
-              if (frameElement.contentWindow === currentWindow) {
-                rect = frameElement.getBoundingClientRect();
-                positions.push({x: rect.x, y: rect.y});
-              }
-            }
-            currentWindow = currentParentWindow;
-            break;
-          }
-      }
-
-      return positions.reduce((accumulator, currentValue) => {
-        return {
-          x: accumulator.x + currentValue.x,
-          y: accumulator.y + currentValue.y
-        };
-      }, { x: 0, y: 0 });
-    }
-
-    function getIsElementInViewport (el) {
-      const rect = el.getBoundingClientRect();
-      const currentFramePosition = getCurrentFrameAbsolutePosition();
-      const elemTop = rect.top + currentFramePosition.y;
-      const elemBottom = rect.bottom * 0.85 + currentFramePosition.y;
-
-      return (
-        elemTop >= 0 &&
-        rect.left >= 0 &&
-        elemBottom <= (actualWindow.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (actualWindow.innerWidth || document.documentElement.clientWidth)
-      );
-    }
-
-    function onVisibilityChange(el, callback) {
-      let oldVisible;
-      return function () {
-        const visible = getIsElementInViewport(el);
-        if (visible != oldVisible) {
-          oldVisible = visible;
-          callback(visible);
-        }
-      }
-    }
-
-    const video = document.getElementById("video-banner");
-    const source = document.getElementById("video-banner-source");
-    const link = document.getElementById("video-banner-link");
-    const qs = getQueryParams(document.location.search);
-
-    if (qs.src) {
-      source.src = qs.src;
-    }
-
-    if (qs.href) {
-      link.href = qs.href;
-    }
-
-    if (qs.loop) {
-      video.loop = true;
-    }
-
-    if (qs.poster) {
-      video.poster = qs.poster;
-    }
-
-    video.onloadstart = function() {
-      const playerHandler = onVisibilityChange(video, function(isVisible) {
-        if (document.hidden) {
-          return video.pause();
-        }
-
-        if (isVisible) {
-          video.play();
-        } else {
-          video.pause();
-        }
-      });
-
-      const handler = debounce(playerHandler, 500);
-
-      if (actualWindow.addEventListener) {
-        actualWindow.addEventListener('DOMContentLoaded', handler, false); 
-        actualWindow.addEventListener('load', handler, false); 
-        actualWindow.addEventListener('scroll', handler, false); 
-        actualWindow.addEventListener('resize', handler, false); 
-      } else if (actualWindow.attachEvent)  {
-        actualWindow.attachEvent('onDOMContentLoaded', handler); // IE9+ :(
-        actualWindow.attachEvent('onload', handler);
-        actualWindow.attachEvent('onscroll', handler);
-        actualWindow.attachEvent('onresize', handler);
-      }
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          return video.pause();
-        }
-        
-        getIsElementInViewport(video) && video.play();
-      });
-
-      if (qs.sound) {
-        video.addEventListener('mouseover', function(){
-          video.muted = false;
-        });
-
-        video.addEventListener('mouseout', function(){
-          video.muted = true;
-        });
-      }
-    };
+      event.data.isVisible ? video.play() : (!video.paused && video.pause());
+    },
+    false
+  );
   </script>
 </body>
 </html>

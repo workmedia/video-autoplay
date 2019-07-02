@@ -15,8 +15,14 @@
   <title>Document</title>
 </head>
 <body>
-    <iframe src="http://localhost:3000/?src=grupopuma.mp4&poster=cover.png&sound=1">
+    <iframe src="http://localhost:3000/?src=grupopuma.mp4&poster=cover.png&sound=1" id="asdsadas" name="asdsad">
       Couldnt open.
     </iframe>
+    <script>
+      window.addEventListener('message', function(event) {
+        const el = document.querySelector('iframe');
+        el.contentWindow.postMessage(event.data, '*');
+      }, false);
+    </script>
 </body>
 </html>
